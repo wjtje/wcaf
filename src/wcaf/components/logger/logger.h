@@ -22,6 +22,7 @@ class Logger : public wcaf::Component {
   void set_baud_rate(uint64_t baud_rate) { this->baud_rate_ = baud_rate; }
   void set_buffer_size(size_t size) { this->buff_size_ = size; }
 
+#if defined(ARDUINO_AVR_UNO)
   void print(const char *tag, int line, uint_farptr_t format_addr,
              size_t format_size, va_list args) {
     auto format_buff = (char *)malloc(format_size);
@@ -35,6 +36,16 @@ class Logger : public wcaf::Component {
     delete format_buff;
     Serial.println(this->buff_);
   }
+#elif defined(ARDUINO_ARCH_ESP8266)
+  void print(const char *tag, int line, const char *format, va_list args) {
+    this->buff_pos_ = 0;
+    this->printf_to_buff_("[%s:%03u]: ", tag, line);
+    this->vsnprintf_to_buff_(format, args);
+    this->buff_[this->buff_size_ - 1] = 0x00;
+
+    Serial.println(this->buff_);
+  }
+#endif
 
  protected:
   uint64_t baud_rate_{115200};

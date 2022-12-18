@@ -21,10 +21,22 @@ void Button::loop() {
 
       if (this->status_ == 0) {
         WCAF_LOG("%i was released", this->gpio_->get_gpio());
-        if (this->on_release_.has_value()) this->on_release_.value()(argument_);
+        // The argument value is only needed for the AVR_UNO version
+        if (this->on_release_.has_value())
+          this->on_release_.value()(
+#ifdef ARDUINO_AVR_UNO
+              argument_
+#endif
+          );
       } else {
         WCAF_LOG("%i was pressed", this->gpio_->get_gpio());
-        if (this->on_press_.has_value()) this->on_press_.value()(argument_);
+        if (this->on_press_.has_value())
+          this->on_press_.value()(
+#ifdef ARDUINO_AVR_UNO
+              argument_
+#endif
+          );
+        ;
       }
     }
   }

@@ -19,9 +19,18 @@ class Button : public Component {
   void set_gpio(gpio::GPIO *gpio) { this->gpio_ = gpio; };
   void set_debounce(uint32_t debouce) { this->debouce_time_ = debouce; }
 
+#ifdef ARDUINO_AVR_UNO
   void set_argument(void *argument) { this->argument_ = argument; }
   void set_on_press(void (*lambda)(void *)) { this->on_press_ = lambda; }
   void set_on_release(void (*lambda)(void *)) { this->on_release_ = lambda; }
+#elif defined(ARDUINO_ARCH_ESP8266)
+  void set_on_press(std::function<void()> &&lambda) {
+    this->on_press_ = lambda;
+  }
+  void set_on_release(std::function<void()> &&lambda) {
+    this->on_release_ = lambda;
+  }
+#endif
 
  protected:
   // Value for the component
@@ -35,9 +44,14 @@ class Button : public Component {
   // The current status of the button
   bool status_;
 
+#ifdef ARDUINO_AVR_UNO
   void *argument_{nullptr};
   optional::Optional<void (*)(void *)> on_press_;
   optional::Optional<void (*)(void *)> on_release_;
+#elif defined(ARDUINO_ARCH_ESP8266)
+  optional::Optional<std::function<void()> > on_press_;
+  optional::Optional<std::function<void()> > on_release_;
+#endif
 };
 
 }  // namespace button
