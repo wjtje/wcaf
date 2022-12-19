@@ -179,17 +179,17 @@ auto value = gpio_->read_digital();
 
 ```cpp
 // Constructors
-GPIO(uint8_t gpio)
-GPIO(uint8_t gpio, bool inverted)
+GPIO(uint8_t gpio);
+GPIO(uint8_t gpio, bool inverted);
 
 // Functions
-void set_mode(uint8_t mode)
+void set_mode(uint8_t mode);
 
-void write_digital(bool state)
+void write_digital(bool state);
 bool read_digital()
 
-void write_analog(int state)
-int read_analog()
+void write_analog(int state);
+int read_analog();
 ```
 
 ### Optional
@@ -232,11 +232,11 @@ button_->on_release([]() {
 **Functions:**
 
 ```cpp
-void set_gpio(gpio::GPIO *gpio)
-void set_debounce(uint32_t debouce)
+void set_gpio(gpio::GPIO *gpio);
+void set_debounce(uint32_t debouce);
 // For callback function on Arduino see bottom of the page
-void on_press(std::function<void()> &&lambda)
-void on_release(std::function<void()> &&lambda)
+void on_press(std::function<void()> &&lambda);
+void on_release(std::function<void()> &&lambda);
 ```
 
 ### Led Component
@@ -257,9 +257,9 @@ led_->turn_on();
 **Functions:**
 
 ```cpp
-void set_gpio(gpio::GPIO *gpio)
-void set_duration(uint32_t duration)
-void set_interval(uint32_t interval)
+void set_gpio(gpio::GPIO *gpio);
+void set_duration(uint32_t duration);
+void set_interval(uint32_t interval);
 
 void set_state(float state);
 float get_state();
@@ -292,9 +292,9 @@ application_.register_component(interval_);
 **Functions:**
 
 ```cpp
-void set_interval(uint32_t interval)
+void set_interval(uint32_t interval);
 // For callback function on Arduino see bottom of the page
-void set_callback(std::function<void()> &&callback)
+void set_callback(std::function<void()> &&callback);
 ```
 
 ### Sensor Component
@@ -317,10 +317,10 @@ application_.register_component(sensor_);
 **Functions:**
 
 ```cpp
-void set_gpio(gpio::GPIO *gpio)
-void set_interval(uint32_t interval)
+void set_gpio(gpio::GPIO *gpio);
+void set_interval(uint32_t interval);
 // For lambda function on Arduino see bottom of the page
-void on_value(std::function<void(int)> &&lambda)
+void on_value(std::function<void(int)> &&lambda);
 ```
 
 ## Difference between Arduino and ESP8266
