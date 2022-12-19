@@ -14,6 +14,7 @@
   - [Button Component](#button-component)
   - [Led Component](#led-component)
   - [Interval Component](#interval-component)
+  - [Sensor Component](#sensor-component)
 - [Difference between Arduino and ESP8266](#difference-between-arduino-and-esp8266)
 - [License](#license)
 
@@ -28,19 +29,6 @@
 
 ```mermaid
 classDiagram
-
-  class GPIO {
-    #uint8_t gpio_
-    #bool inverted_
-    +GPIO(gpio)
-    +GPIO(gpio, inverted)
-    +set_mode(mode)
-    +write_digital(state)
-    +write_analog(state)
-    +read_digital() bool
-    +read_analog() int
-    +get_gpio() uint8_8
-  }
 
   class Component {
     <<Interface>>
@@ -92,8 +80,29 @@ classDiagram
     +set_gpio(gpio)
     +set_debounce(time)
     +set_argument(argument)
-    +set_on_press(lambda)
-    +set_on_release(lambda)
+    +on_press(lambda)
+    +on_release(lambda)
+  }
+
+  Component <|-- Sensor
+  GPIO .. Sensor
+  class Sensor {
+    +set_gpio(gpio)
+    +set_interval(interval)
+    +on_value(lambda)
+  }
+
+  class GPIO {
+    #uint8_t gpio_
+    #bool inverted_
+    +GPIO(gpio)
+    +GPIO(gpio, inverted)
+    +set_mode(mode)
+    +write_digital(state)
+    +write_analog(state)
+    +read_digital() bool
+    +read_analog() int
+    +get_gpio() uint8_8
   }
 ```
 
@@ -202,7 +211,7 @@ if (state_.has_value()) {
 
 ## Using built-in components
 
-WCAF includes a few components to get you started. These components include the Button Component, Led Component, and Interval Component.
+WCAF includes a few components to get you started. These components include the Button Component, Led Component, Interval Component, and Sensor Component.
 
 ### Button Component
 
@@ -215,7 +224,7 @@ The Button Component will read a digital value and debouce it before calling the
 
 auto button_ = new button::Button();
 button_->set_gpio(new gpio::GPIO(5, true));
-button_->set_on_release([]() {
+button_->on_release([]() {
   WCAF_LOG("I've been released!");
 });
 ```
@@ -226,8 +235,8 @@ button_->set_on_release([]() {
 void set_gpio(gpio::GPIO *gpio)
 void set_debounce(uint32_t debouce)
 // For callback function on Arduino see bottom of the page
-void set_on_press(std::function<void()> &&lambda)
-void set_on_release(std::function<void()> &&lambda)
+void on_press(std::function<void()> &&lambda)
+void on_release(std::function<void()> &&lambda)
 ```
 
 ### Led Component
@@ -286,6 +295,32 @@ application_.register_component(interval_);
 void set_interval(uint32_t interval)
 // For callback function on Arduino see bottom of the page
 void set_callback(std::function<void()> &&callback)
+```
+
+### Sensor Component
+
+The Sensor Component will read an analog value every interval ms and run the `on_value` callback function.
+
+**Example:**
+
+```cpp
+interval::Interval* sensor_ = new interval::Interval();
+sensor_.set_gpio(new gpio::GPIO(A0));
+sensor_->set_interval(1000);
+sensor_->on_value([](int value) {
+  // This code runs every second
+  WCAF_LOG("Got value: %i", value);
+});
+application_.register_component(sensor_);
+```
+
+**Functions:**
+
+```cpp
+void set_gpio(gpio::GPIO *gpio)
+void set_interval(uint32_t interval)
+// For lambda function on Arduino see bottom of the page
+void on_value(std::function<void(int)> &&lambda)
 ```
 
 ## Difference between Arduino and ESP8266

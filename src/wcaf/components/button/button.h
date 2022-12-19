@@ -21,13 +21,13 @@ class Button : public Component {
 
 #ifdef ARDUINO_AVR_UNO
   void set_argument(void *argument) { this->argument_ = argument; }
-  void set_on_press(void (*lambda)(void *)) { this->on_press_ = lambda; }
-  void set_on_release(void (*lambda)(void *)) { this->on_release_ = lambda; }
+  void on_press(void (*lambda)(void *)) { this->on_press_ = lambda; }
+  void on_release(void (*lambda)(void *)) { this->on_release_ = lambda; }
 #elif defined(ARDUINO_ARCH_ESP8266)
-  void set_on_press(std::function<void()> &&lambda) {
+  void on_press(std::function<void()> &&lambda) {
     this->on_press_ = lambda;
   }
-  void set_on_release(std::function<void()> &&lambda) {
+  void on_release(std::function<void()> &&lambda) {
     this->on_release_ = lambda;
   }
 #endif
