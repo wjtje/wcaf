@@ -3,14 +3,26 @@
 namespace wcaf {
 namespace led {
 
-const char* Led::TAG = "Led";
+const char *Led::TAG = "Led";
 
 void Led::setup() {
   this->gpio_->set_mode(OUTPUT);
   this->gpio_->write_digital(false);
+  if (this->interval_ == nullptr) this->interval_ = new interval::Interval();
+
+#ifdef ARDUINO_AVR_UNO
+  this->interval_->set_argument(this);
+  this->interval_->set_callback([](void *argument) {
+    auto led = (led::Led *)argument;
+    led->toggle();
+  });
+#elif defined(ARDUINO_ARCH_ESP8266)
+  this->interval_->set_callback([this]() { this->toggle(); });
+#endif
 }
 
 void Led::loop() {
+  if (this->blinking_) this->interval_->loop();
   if (!this->state_changed_) return;
 
   uint32_t now = millis();

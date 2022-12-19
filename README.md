@@ -250,10 +250,18 @@ led_->turn_on();
 ```cpp
 void set_gpio(gpio::GPIO *gpio)
 void set_duration(uint32_t duration)
+void set_interval(uint32_t interval)
+
 void set_state(float state);
+float get_state();
+
 void turn_on();
 void turn_off();
-float get_state();
+void toggle();
+
+void start_blinking();
+void stop_blinking();
+void toggle_blinking();
 ```
 
 ### Interval Component
