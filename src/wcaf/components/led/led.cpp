@@ -6,8 +6,7 @@ namespace led {
 const char *Led::TAG = "Led";
 
 void Led::setup() {
-  this->gpio_->set_mode(OUTPUT);
-  this->gpio_->write_digital(false);
+  this->output_->write(false);
   if (this->interval_ == nullptr) this->interval_ = new interval::Interval();
 
 #ifdef ARDUINO_AVR_UNO
@@ -41,13 +40,13 @@ void Led::loop() {
     this->state_ = lerp(progress, this->prev_state_, this->target_state_);
   }
 
-  this->gpio_->write_analog(this->state_ * 255);
+  this->output_->write(this->state_);
 }
 
 void Led::set_state(float state) {
   if (this->target_state_ == state) return;
 
-  WCAF_LOG("%i, setting target state to: %0.1f", this->gpio_->get_gpio(),
+  WCAF_LOG("%i, setting target state to: %0.1f", this->output_->get_pin(),
            state);
 
   this->target_state_ = state;

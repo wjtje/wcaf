@@ -5,10 +5,10 @@ namespace button {
 
 const char* Button::TAG = "Button";
 
-void Button::setup() { this->gpio_->set_mode(INPUT_PULLUP); }
+void Button::setup() {}
 
 void Button::loop() {
-  bool status = this->gpio_->read_digital();
+  bool status = this->input_->read_digital();
 
   if (this->last_button_state_ != status) {
     this->last_button_time_ = millis();
@@ -20,7 +20,7 @@ void Button::loop() {
       this->status_ = status;
 
       if (this->status_ == 0) {
-        WCAF_LOG("%i was released", this->gpio_->get_gpio());
+        WCAF_LOG("%i was released", this->input_->get_pin());
         // The argument value is only needed for the AVR_UNO version
         if (this->on_release_.has_value())
           this->on_release_.value()(
@@ -29,7 +29,7 @@ void Button::loop() {
 #endif
           );
       } else {
-        WCAF_LOG("%i was pressed", this->gpio_->get_gpio());
+        WCAF_LOG("%i was pressed", this->input_->get_pin());
         if (this->on_press_.has_value())
           this->on_press_.value()(
 #ifdef ARDUINO_AVR_UNO

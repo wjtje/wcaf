@@ -8,7 +8,8 @@
 - [Class Diagram](#class-diagram)
 - [Example program](#example-program)
 - [Using built-in helpers](#using-built-in-helpers)
-  - [GPIO](#gpio)
+  - [Input](#input)
+  - [Output](#output)
   - [Optional](#optional)
 - [Using built-in components](#using-built-in-components)
   - [Button Component](#button-component)
@@ -60,9 +61,9 @@ classDiagram
   }
 
   Component <|-- Led
-  GPIO .. Led
+  Output .. Led
   class Led {
-    +set_gpio(gpio)
+    +set_output(output)
     +set_duration(duration)
     +turn_on()
     +turn_off()
@@ -71,13 +72,13 @@ classDiagram
   }
 
   Component <|-- Button
-  GPIO .. Button
+  BinaryInput .. Button
   class Button {
     #bool last_button_state_
     #bool status_
     #uint32_t last_button_time_
 
-    +set_gpio(gpio)
+    +set_input(input)
     +set_debounce(time)
     +set_argument(argument)
     +on_press(lambda)
@@ -85,24 +86,62 @@ classDiagram
   }
 
   Component <|-- Sensor
-  GPIO .. Sensor
+  FloatInput .. Sensor
   class Sensor {
-    +set_gpio(gpio)
+    +set_input(input)
     +set_interval(interval)
     +on_value(lambda)
   }
 
-  class GPIO {
-    #uint8_t gpio_
-    #bool inverted_
-    +GPIO(gpio)
-    +GPIO(gpio, inverted)
-    +set_mode(mode)
-    +write_digital(state)
-    +write_analog(state)
+  class Output {
+    +Output(inverted)
+    +write(bool state)
+    +write(float state)
+    +get_pin() uint8_t
+  }
+
+  Output <|-- BinaryOutput
+  class BinaryOutput {
+  }
+
+  class Input {
+    +Input(inverted)
+    +read() float
     +read_digital() bool
-    +read_analog() int
-    +get_gpio() uint8_8
+    +get_pin() uint8_t
+  }
+
+  Input <|-- BinaryInput
+  class BinaryInput {
+  }
+
+  Input <|-- FloatInput
+  class FloatInput {
+  }
+
+  FloatInput <|-- AnalogInput
+  class AnalogInput {
+    +AnalogInput(gpio, inverted = false, mode = INPUT)
+  }
+
+  BinaryInput <|-- GpioInput
+  class GpioInput {
+    +GpioInput(gpio, inverted = false, mode = INPUT)
+  }
+
+  BinaryOutput <|-- GpioOutput
+  class GpioOutput {
+    +GpioOutput(gpio, inverted = false)
+  }
+
+  Output <|-- LedcOutput
+  class LedcOutput {
+    +LedcOutput(gpio, inverted = false, freq = 1000)
+  }
+
+  Output <|-- PwmOutput
+  class PwmOutput {
+    +PwmOutput(gpio, inverted = false)
   }
 ```
 
@@ -162,34 +201,61 @@ This code will result in the follow logs
 
 WCAF includes a few helpers that are used by multiple components and can be used in custom components.
 
-### GPIO
+### Input
 
-The GPIO helper will read and write digital or analog values to a specific pin. It can also handle if the pin is inverted.
+The Input helper will read analog or digital value and invert them if needed.
 
 **Example:**
 
 ```cpp
-#include <wcaf/helpers/gpio.h>
+#include <wcaf/helpers/input/analog.h>
+#include <wcaf/helpers/input/gpio.h>
 
-auto gpio_ = new gpio::GPIO(6);
-auto value = gpio_->read_digital();
+auto analog = new input::AnalogInput(A0);
+float value = gpio_->read();
+
+auto digital = new fpio::GpioInput(2);
+bool value = gpio_->read_digital();
 ```
 
 **Functions:**
 
 ```cpp
 // Constructors
-GPIO(uint8_t gpio);
-GPIO(uint8_t gpio, bool inverted);
+input::GpioInput(uint8_t gpio, bool inverted = false, uint8_t mode = INPUT);
+input::AnalogInput(uint8_t gpio, bool inverted = false, uint8_t mode = INPUT);
 
 // Functions
-void set_mode(uint8_t mode);
+float read();
+bool read_digital();
+uint8_t get_pin();
+```
 
-void write_digital(bool state);
-bool read_digital()
+### Output
 
-void write_analog(int state);
-int read_analog();
+The Ouput helper will send a state to a gpio pin.
+
+**Example:**
+
+```cpp
+#include <wcaf/helpers/output/pwm.h>
+
+auto output = new output::PwmOutput(6);
+output->write(0.25f);
+```
+
+**Functions:**
+
+```cpp
+// Constructors
+output::GpioOutput(uint8_t gpio, bool inverted = false);
+output::LedcOutput(uint8_t gpio, bool inverted = false, double freq = 1000);
+output::PwmOutput(uint8_t gpio, bool inverted = false);
+
+// Functions
+void write(bool state);
+void write(float state);
+uint8_t get_pin();
 ```
 
 ### Optional
@@ -223,7 +289,7 @@ The Button Component will read a digital value and debouce it before calling the
 #include <wcaf/components/button/button.h>
 
 auto button_ = new button::Button();
-button_->set_gpio(new gpio::GPIO(5, true));
+button_->set_input(new input::GpioInput(7));
 button_->on_release([]() {
   WCAF_LOG("I've been released!");
 });
@@ -232,7 +298,7 @@ button_->on_release([]() {
 **Functions:**
 
 ```cpp
-void set_gpio(gpio::GPIO *gpio);
+void set_input(interface::Input *input);
 void set_debounce(uint32_t debouce);
 // For callback function on Arduino see bottom of the page
 void on_press(std::function<void()> &&lambda);
@@ -247,7 +313,7 @@ The Led Component will send a 'smooth' pwm value to a gpio pin to change the sta
 
 ```cpp
 auto led_ = new led::Led();
-led_->set_gpio(new gpio::GPIO(2, true));
+led_->set_output(new output::PwmOutput(2));
 application_.register_component(led_);
 
 // Somewhere else in your code
@@ -257,7 +323,7 @@ led_->turn_on();
 **Functions:**
 
 ```cpp
-void set_gpio(gpio::GPIO *gpio);
+void set_output(interface::Output *output);
 void set_duration(uint32_t duration);
 void set_interval(uint32_t interval);
 
@@ -305,11 +371,11 @@ The Sensor Component will read an analog value every interval ms and run the `on
 
 ```cpp
 interval::Interval* sensor_ = new interval::Interval();
-sensor_.set_gpio(new gpio::GPIO(A0));
+sensor_->set_input(new input::AnalogInput(A0));
 sensor_->set_interval(1000);
-sensor_->on_value([](int value) {
+sensor_->on_value([](float value) {
   // This code runs every second
-  WCAF_LOG("Got value: %i", value);
+  WCAF_LOG("Got value: %0.1f", value);
 });
 application_.register_component(sensor_);
 ```
@@ -317,10 +383,10 @@ application_.register_component(sensor_);
 **Functions:**
 
 ```cpp
-void set_gpio(gpio::GPIO *gpio);
+void set_input(interface::Input *input);
 void set_interval(uint32_t interval);
 // For lambda function on Arduino see bottom of the page
-void on_value(std::function<void(int)> &&lambda);
+void on_value(std::function<void(float)> &&lambda);
 ```
 
 ## Difference between Arduino and ESP8266
@@ -330,11 +396,11 @@ Due to the Arduino not having support for the default cpp libraries a few small 
 ```cpp
 // Arduino
 auto led_ = new led::Led();
-led_->set_gpio(new gpio::GPIO(2, true));
+led_->set_output(new output::PwmOutput(2, true));
 application_.register_component(led_);
 
 auto button_ = new button::Button();
-button_->set_gpio(new gpio::GPIO(5, true));
+button_->set_input(new input::GpioInput(5, true));
 button_->set_argument(led_)
 button_->set_on_release([](void *argument) {
   auto led_ = (led::Led *)argument;
@@ -344,11 +410,11 @@ application_.register_component(button_);
 
 // ESP8266
 auto led_ = new led::Led();
-led_->set_gpio(new gpio::GPIO(2, true));
+led_->set_output(new output::PwmOutput(2, true));
 application_.register_component(led_);
 
 auto button_ = new button::Button();
-button_->set_gpio(new gpio::GPIO(5, true));
+button_->set_input(new input::GpioInput(5, true));
 button_->set_on_release([led_]() {
   WCAF_LOG("The led state is: %0.1f", led_.get_state());
 });

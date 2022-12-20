@@ -7,8 +7,8 @@
 
 #include "wcaf/core/component.h"
 #include "wcaf/core/log.h"
-#include "wcaf/helpers/gpio.h"
 #include "wcaf/helpers/optional.h"
+#include "wcaf/interfaces/input.h"
 
 namespace wcaf {
 namespace button {
@@ -20,7 +20,7 @@ class Button : public Component {
   const char *get_tag() { return TAG; }
   static const char *TAG;
 
-  void set_gpio(gpio::GPIO *gpio) { this->gpio_ = gpio; };
+  void set_input(interface::Input *input) { this->input_ = input; };
   void set_debounce(uint32_t debouce) { this->debouce_time_ = debouce; }
 
 #ifdef ARDUINO_AVR_UNO
@@ -35,8 +35,7 @@ class Button : public Component {
 #endif
 
  protected:
-  // Value for the component
-  gpio::GPIO *gpio_;
+  interface::Input *input_;
 
   // Values for debouncing
   bool last_button_state_;

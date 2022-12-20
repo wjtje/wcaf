@@ -4,8 +4,8 @@
 #include "wcaf/components/interval/interval.h"
 #include "wcaf/core/component.h"
 #include "wcaf/core/log.h"
-#include "wcaf/helpers/gpio.h"
 #include "wcaf/helpers/math.h"
+#include "wcaf/interfaces/output.h"
 
 namespace wcaf {
 namespace led {
@@ -17,7 +17,7 @@ class Led : public Component {
   const char *get_tag() { return TAG; }
   static const char *TAG;
 
-  void set_gpio(gpio::GPIO *gpio) { this->gpio_ = gpio; }
+  void set_output(interface::Output *output) { this->output_ = output; }
   void set_duration(uint32_t duration) { this->duration_ = duration; }
   void set_interval(uint32_t interval) {
     if (this->interval_ == nullptr) this->interval_ = new interval::Interval();
@@ -43,7 +43,7 @@ class Led : public Component {
   void toggle_blinking() { this->blinking_ = !this->blinking_; }
 
  protected:
-  gpio::GPIO *gpio_;
+  interface::Output *output_;
   interval::Interval *interval_{nullptr};
 
   bool blinking_{false};
