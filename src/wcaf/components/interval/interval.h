@@ -1,6 +1,10 @@
 #pragma once
 #include <Arduino.h>
 
+#if defined(ARDUINO_ESP32_DEV)
+#include <functional>
+#endif
+
 #include "wcaf/core/component.h"
 #include "wcaf/core/log.h"
 
@@ -18,7 +22,7 @@ class Interval : public Component {
 #ifdef ARDUINO_AVR_UNO
   void set_argument(void *argument) { this->argument_ = argument; }
   void set_callback(void (*callback)(void *)) { this->callback_ = callback; }
-#elif defined(ARDUINO_ARCH_ESP8266)
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
   void set_callback(std::function<void()> &&callback) {
     this->callback_ = callback;
   }
@@ -31,7 +35,7 @@ class Interval : public Component {
 #ifdef ARDUINO_AVR_UNO
   void *argument_{nullptr};
   void (*callback_)(void *);
-#elif defined(ARDUINO_ARCH_ESP8266)
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
   std::function<void()> callback_;
 #endif
 };

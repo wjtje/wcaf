@@ -16,7 +16,7 @@ void Led::setup() {
     auto led = (led::Led *)argument;
     led->toggle();
   });
-#elif defined(ARDUINO_ARCH_ESP8266)
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
   this->interval_->set_callback([this]() { this->toggle(); });
 #endif
 }

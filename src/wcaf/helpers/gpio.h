@@ -14,15 +14,23 @@ class GPIO {
   void write_digital(bool state) {
     digitalWrite(this->gpio_, state ^ this->inverted_);
   }
-  void write_analog(int state) {
-    if (this->inverted_) state = 255 - state;
-    analogWrite(this->gpio_, state);
+  void write_analog(float state) {
+    if (this->inverted_) state = 1.0f - state;
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_ARCH_ESP8266)
+    analogWrite(this->gpio_, state * 255);
+#else defined(ARDUINO_ESP32_DEV)
+    Serial.println("Well, this doesn't work yet");
+#endif
   }
 
   bool read_digital() { return digitalRead(this->gpio_) ^ this->inverted_; }
-  int read_analog() {
-    if (this->inverted_) return 255 - analogRead(this->gpio_);
-    return analogRead(this->gpio_);
+  float read_analog() {
+#if defined(ARDUINO_ESP32_DEV)
+    analogReadResolution(10);
+#endif
+    float state = analogRead(this->gpio_) / 1023.0f;
+    if (this->inverted_) return 1.0f - state;
+    return state;
   }
 
   uint8_t get_gpio() { return this->gpio_; }

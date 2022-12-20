@@ -13,7 +13,7 @@ void wcaf_log(const char *tag, int line, uint_farptr_t format_addr,
   log->print(tag, line, format_addr, format_size, args);
   va_end(args);
 }
-#elif defined(ARDUINO_ARCH_ESP8266)
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
 void wcaf_log(const char *tag, int line, const char *format, ...) {
   auto *log = logger::global_logger;
   if (log == nullptr) return;

@@ -36,7 +36,7 @@ class Logger : public wcaf::Component {
     delete format_buff;
     Serial.println(this->buff_);
   }
-#elif defined(ARDUINO_ARCH_ESP8266)
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
   void print(const char *tag, int line, const char *format, va_list args) {
     this->buff_pos_ = 0;
     this->printf_to_buff_("[%s:%03u]: ", tag, line);

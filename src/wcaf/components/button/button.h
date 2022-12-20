@@ -1,6 +1,10 @@
 #pragma once
 #include <Arduino.h>
 
+#if defined(ARDUINO_ESP32_DEV)
+#include <functional>
+#endif
+
 #include "wcaf/core/component.h"
 #include "wcaf/core/log.h"
 #include "wcaf/helpers/gpio.h"
@@ -23,10 +27,8 @@ class Button : public Component {
   void set_argument(void *argument) { this->argument_ = argument; }
   void on_press(void (*lambda)(void *)) { this->on_press_ = lambda; }
   void on_release(void (*lambda)(void *)) { this->on_release_ = lambda; }
-#elif defined(ARDUINO_ARCH_ESP8266)
-  void on_press(std::function<void()> &&lambda) {
-    this->on_press_ = lambda;
-  }
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
+  void on_press(std::function<void()> &&lambda) { this->on_press_ = lambda; }
   void on_release(std::function<void()> &&lambda) {
     this->on_release_ = lambda;
   }
@@ -48,7 +50,7 @@ class Button : public Component {
   void *argument_{nullptr};
   optional::Optional<void (*)(void *)> on_press_;
   optional::Optional<void (*)(void *)> on_release_;
-#elif defined(ARDUINO_ARCH_ESP8266)
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
   optional::Optional<std::function<void()> > on_press_;
   optional::Optional<std::function<void()> > on_release_;
 #endif

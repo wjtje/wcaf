@@ -1,5 +1,9 @@
 #pragma once
 
+#if defined(ARDUINO_ESP32_DEV)
+#include <functional>
+#endif
+
 #include "wcaf/components/interval/interval.h"
 #include "wcaf/core/component.h"
 #include "wcaf/core/log.h"
@@ -25,7 +29,7 @@ class Sensor : public Component {
 #ifdef ARDUINO_AVR_UNO
   void set_argument(void *argument) { this->argument_ = argument; }
   void on_value(void (*lambda)(int, void *)) { this->on_value_ = lambda; }
-#elif defined(ARDUINO_ARCH_ESP8266)
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
   void on_value(std::function<void(int)> &&lambda) { this->on_value_ = lambda; }
 #endif
 
@@ -36,7 +40,7 @@ class Sensor : public Component {
 #ifdef ARDUINO_AVR_UNO
   void *argument_{nullptr};
   optional::Optional<void (*)(int, void *)> on_value_;
-#elif defined(ARDUINO_ARCH_ESP8266)
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
   optional::Optional<std::function<void(int)> > on_value_;
 #endif
 };

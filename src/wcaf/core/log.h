@@ -14,7 +14,7 @@ void wcaf_log(const char *tag, int line, uint_farptr_t format_addr,
     wcaf_log(TAG, __LINE__, pgm_get_far_address(__c), sizeof(__c), \
              ##__VA_ARGS__);                                       \
   }));
-#elif defined(ARDUINO_ARCH_ESP8266)
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
 void wcaf_log(const char *tag, int line, const char *format, ...);
 
 #define WCAF_LOG(format, ...) wcaf_log(TAG, __LINE__, format, ##__VA_ARGS__);
