@@ -1,4 +1,4 @@
-#include "ldec.h"
+#include "ledc.h"
 #if defined(ARDUINO_ESP32_DEV)
 
 namespace wcaf {
