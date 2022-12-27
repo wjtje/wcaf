@@ -19,6 +19,7 @@ class List {
     T *operator->() { return &ptr_->data; }
 
     Iterator &operator++() {
+      prev_ptr_ = ptr_;
       ptr_ = ptr_->next;
       return *this;
     }
@@ -35,7 +36,7 @@ class List {
       return a.ptr_ != b.ptr_;
     }
 
-   protected:
+    Node *prev_ptr_;
     Node *ptr_;
   };
 
@@ -58,6 +59,21 @@ class List {
   }
 
   /**
+   * @brief Adds a new item to the front of the list
+   *
+   * @param data
+   */
+  void push_front(T data) {
+    Node *node = (Node *)malloc(sizeof(Node));
+    node->data = data;
+    node->next = this->head_;
+
+    this->head_ = node;
+
+    if (this->tail_ == nullptr) this->tail_ = node;
+  }
+
+  /**
    * @brief Get the amount of items stored in the list.
    *
    * @return int
@@ -76,6 +92,34 @@ class List {
 
   Iterator begin() { return Iterator(this->head_); }
   Iterator end() { return Iterator(nullptr); }
+
+  Iterator erase(Iterator it) {
+    Node *prev = it.prev_ptr_;
+    Node *current = it.ptr_;
+    Node *next = current->next;
+
+    // Move next point to the correct location
+    if (prev->next != current)
+      this->head_ = next;
+    else
+      prev->next = next;
+
+    // Update tail if needed
+    if (prev->next == nullptr) this->tail_ = prev;
+
+    // Free up memory
+    delete current;
+
+    return Iterator(next);
+  }
+
+  Iterator erase(T data) {
+    for (List<int>::Iterator it = this->begin(); it != this->end();) {
+      if (data == *it) return this->erase(it);
+    }
+
+    return this->end();
+  }
 
  protected:
   Node *head_ = nullptr;
