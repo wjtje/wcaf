@@ -424,3 +424,5 @@ application_.register_component(button_);
 ## License
 
 The MIT License (MIT) - Copyright (c) 2022 Wouter van der Wal
+
+This code comes with ABSOLUTELY NO WARRANTY.
