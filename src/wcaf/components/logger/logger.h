@@ -5,7 +5,27 @@
 #include <wcaf/core/component.h>
 #include <wcaf/core/log.h>
 
+#define WCAF_LOG_COLOR_RED "31"     // ERROR
+#define WCAF_LOG_COLOR_GREEN "32"   // INFO
+#define WCAF_LOG_COLOR_YELLOW "33"  // WARNING
+
+#define WCAF_LOG_COLOR(COLOR) "\033[0;" COLOR "m"
+#define WCAF_LOG_RESET_COLOR "\033[0m"
+
 namespace wcaf {
+
+static const char *const LOG_LEVEL_COLORS[] = {
+    "",                                     // NONE
+    WCAF_LOG_COLOR(WCAF_LOG_COLOR_RED),     // ERROR
+    WCAF_LOG_COLOR(WCAF_LOG_COLOR_YELLOW),  // WARNING
+    WCAF_LOG_COLOR(WCAF_LOG_COLOR_GREEN),   // INFO
+};
+static const char *const LOG_LEVEL_LETTERS[] = {
+    " ",  // NONE
+    "E",  // ERROR
+    "W",  // WARNING
+    "I",  // INFO
+};
 
 void wcaf_log(const char *tag, int line, const char *format, ...);
 
@@ -23,14 +43,17 @@ class Logger : public wcaf::Component {
   void set_buffer_size(size_t size) { this->buff_size_ = size; }
 
 #if defined(ARDUINO_AVR_UNO)
-  void print(const char *tag, int line, uint_farptr_t format_addr,
-             size_t format_size, va_list args) {
+  void print(uint8_t level, const char *tag, int line,
+             uint_farptr_t format_addr, size_t format_size, va_list args) {
     auto format_buff = (char *)malloc(format_size);
     memcpy_PF(format_buff, format_addr, format_size);
 
+    if (level > 3) level = 3;
     this->buff_pos_ = 0;
-    this->printf_to_buff_("[%s:%03u]: ", tag, line);
+    this->printf_to_buff_("%s[%s][%s:%03u]: ", LOG_LEVEL_COLORS[level],
+                          LOG_LEVEL_LETTERS[level], tag, line);
     this->vsnprintf_to_buff_(format_buff, args);
+    this->printf_to_buff_(WCAF_LOG_RESET_COLOR);
     this->buff_[this->buff_size_ - 1] = 0x00;
 
     delete format_buff;
@@ -38,13 +61,18 @@ class Logger : public wcaf::Component {
     Serial.flush();
   }
 #elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
-  void print(const char *tag, int line, const char *format, va_list args) {
+  void print(uint8_t level, const char *tag, int line, const char *format,
+             va_list args) {
+    if (level > 3) level = 3;
     this->buff_pos_ = 0;
-    this->printf_to_buff_("[%s:%03u]: ", tag, line);
+    this->printf_to_buff_("%s[%s][%s:%03u]: ", LOG_LEVEL_COLORS[level],
+                          LOG_LEVEL_LETTERS[level], tag, line);
     this->vsnprintf_to_buff_(format, args);
-    this->buff_[this->buff_size_ - 1] = 0x00;
+    int remaining = this->buff_size_ - buff_pos_;
+    int pos = (remaining > 7) ? this->buff_pos_ : this->buff_size_ - 8;
+    memcpy(this->buff_ + pos, "\033[0m\n\0", 7);
 
-    Serial.println(this->buff_);
+    Serial.write(this->buff_);
     Serial.flush();
   }
 #endif

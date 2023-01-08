@@ -6,10 +6,10 @@ namespace application {
 const char *Application::TAG = "Application";
 
 void Application::setup() {
-  WCAF_LOG("Setting up %i component(s)", this->components_.size());
+  WCAF_LOG_INFO("Setting up %i component(s)", this->components_.size());
 
   for (Component *component : this->components_) {
-    WCAF_LOG("Setting up %s", component->get_tag());
+    WCAF_LOG_DEFAULT("Setting up %s", component->get_tag());
     component->setup();
   }
 }
@@ -20,7 +20,8 @@ void Application::loop() {
     component->loop();
 
     if (millis() - start_component > 50) {
-      WCAF_LOG("%s took a long time in the loop, > 50ms", component->get_tag());
+      WCAF_LOG_WARNING("%s took a long time in the loop, > 50ms",
+                       component->get_tag());
     }
   }
 }

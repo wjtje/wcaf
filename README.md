@@ -7,6 +7,7 @@
 - [Features](#features)
 - [Class Diagram](#class-diagram)
 - [Example program](#example-program)
+- [Logging](#logging)
 - [Using built-in helpers](#using-built-in-helpers)
   - [Input](#input)
   - [Output](#output)
@@ -176,7 +177,7 @@ void setup() {
   interval_->set_interval(1000);
   interval_->set_callback([]() {
     // This code runs every second
-    WCAF_LOG("Hello World!")
+    WCAF_LOG_INFO("Hello World!")
   });
   application_.register_component(interval_);
 
@@ -189,12 +190,32 @@ void loop() { application_.loop(); }
 This code will result in the follow logs
 
 ```log
-[Application:009]: Setting up 2 component(s)
-[Application:012]: Setting up Logger
-[Application:012]: Setting up Interval
-[Main:025]: Hello World!
-[Main:025]: Hello World!
-[Main:025]: Hello World!
+[I][Application:009]: Setting up 2 component(s)
+[][Application:012]: Setting up Logger
+[][Application:012]: Setting up Interval
+[I][Main:025]: Hello World!
+[I][Main:025]: Hello World!
+[I][Main:025]: Hello World!
+```
+
+## Logging
+
+One of the most important things to do is generating usefull logs for debugging your code. WCAF includes a simple logging framework with 4 different logging levels (DEFAULT, INFO, WARNING, ERROR).
+
+**Example:**
+
+```cpp
+WCAF_LOG_DEFAULT("Not important");
+WCAF_LOG_INFO("Hej, new data");
+WCAF_LOG_WARNING("Hold up, something is not right");
+WCAF_LOG_ERROR("Welp, it's broken");
+```
+
+```log
+[ ][Main:001]: Not important
+[I][Main:002]: Hej, new data
+[W][Main:003]: Hold up, something is not right
+[E][Main:004]: Welp, it's broken
 ```
 
 ## Using built-in helpers
@@ -271,7 +292,7 @@ optional::Optional<int> state_;
 
 if (state_.has_value()) {
   // Do some with the state
-  WCAF_LOG("We have liftoff! %i", state_.value());
+  WCAF_LOG_INFO("We have liftoff! %i", state_.value());
 }
 ```
 
@@ -291,7 +312,7 @@ The Button Component will read a digital value and debouce it before calling the
 auto button_ = new button::Button();
 button_->set_input(new input::GpioInput(7));
 button_->on_release([]() {
-  WCAF_LOG("I've been released!");
+  WCAF_LOG_INFO("I've been released!");
 });
 ```
 
@@ -350,7 +371,7 @@ interval::Interval* interval_ = new interval::Interval();
 interval_->set_interval(1000);
 interval_->set_callback([]() {
   // This code runs every second
-  WCAF_LOG("Hello World!")
+  WCAF_LOG_INFO("Hello World!")
 });
 application_.register_component(interval_);
 ```
@@ -375,7 +396,7 @@ sensor_->set_input(new input::AnalogInput(A0));
 sensor_->set_interval(1000);
 sensor_->on_value([](float value) {
   // This code runs every second
-  WCAF_LOG("Got value: %0.1f", value);
+  WCAF_LOG_INFO("Got value: %0.1f", value);
 });
 application_.register_component(sensor_);
 ```
@@ -404,7 +425,7 @@ button_->set_input(new input::GpioInput(5, true));
 button_->set_argument(led_)
 button_->set_on_release([](void *argument) {
   auto led_ = (led::Led *)argument;
-  WCAF_LOG("The led state is: %0.1f", led_.get_state());
+  WCAF_LOG_INFO("The led state is: %0.1f", led_.get_state());
 });
 application_.register_component(button_);
 
@@ -416,7 +437,7 @@ application_.register_component(led_);
 auto button_ = new button::Button();
 button_->set_input(new input::GpioInput(5, true));
 button_->set_on_release([led_]() {
-  WCAF_LOG("The led state is: %0.1f", led_.get_state());
+  WCAF_LOG_INFO("The led state is: %0.1f", led_.get_state());
 });
 application_.register_component(button_);
 ```

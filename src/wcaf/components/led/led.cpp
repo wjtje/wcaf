@@ -46,8 +46,8 @@ void Led::loop() {
 void Led::set_state(float state) {
   if (this->target_state_ == state) return;
 
-  WCAF_LOG("%i, setting target state to: %0.1f", this->output_->get_pin(),
-           state);
+  WCAF_LOG_INFO("%i, setting target state to: %0.1f", this->output_->get_pin(),
+                state);
 
   this->target_state_ = state;
   this->prev_state_ = this->state_;
