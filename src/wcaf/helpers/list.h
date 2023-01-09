@@ -114,7 +114,7 @@ class List {
   }
 
   Iterator erase(T data) {
-    for (List<int>::Iterator it = this->begin(); it != this->end();) {
+    for (List<T>::Iterator it = this->begin(); it != this->end();) {
       if (data == *it) return this->erase(it);
     }
 
