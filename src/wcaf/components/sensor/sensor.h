@@ -26,7 +26,7 @@ class Sensor : public Component {
     this->interval_->set_interval(interval);
   }
 
-#ifdef ARDUINO_AVR_UNO
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   void set_argument(void *argument) { this->argument_ = argument; }
   void on_value(void (*lambda)(float, void *)) { this->on_value_ = lambda; }
 #elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
@@ -39,7 +39,7 @@ class Sensor : public Component {
   interface::Input *input_;
   interval::Interval *interval_{nullptr};
 
-#ifdef ARDUINO_AVR_UNO
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   void *argument_{nullptr};
   optional::Optional<void (*)(float, void *)> on_value_;
 #elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)

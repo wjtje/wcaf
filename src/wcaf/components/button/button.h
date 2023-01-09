@@ -23,7 +23,7 @@ class Button : public Component {
   void set_input(interface::Input *input) { this->input_ = input; };
   void set_debounce(uint32_t debouce) { this->debouce_time_ = debouce; }
 
-#ifdef ARDUINO_AVR_UNO
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   void set_argument(void *argument) { this->argument_ = argument; }
   void on_press(void (*lambda)(void *)) { this->on_press_ = lambda; }
   void on_release(void (*lambda)(void *)) { this->on_release_ = lambda; }
@@ -45,7 +45,7 @@ class Button : public Component {
   // The current status of the button
   bool status_;
 
-#ifdef ARDUINO_AVR_UNO
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   void *argument_{nullptr};
   optional::Optional<void (*)(void *)> on_press_;
   optional::Optional<void (*)(void *)> on_release_;

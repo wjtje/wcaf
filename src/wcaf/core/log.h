@@ -4,7 +4,7 @@
 
 namespace wcaf {
 
-#if defined(ARDUINO_AVR_UNO)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
 void wcaf_log(uint8_t level, const char *tag, int line,
               uint_farptr_t format_addr, size_t format_size, ...);
 

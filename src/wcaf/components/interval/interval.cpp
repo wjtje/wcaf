@@ -11,7 +11,7 @@ void Interval::loop() {
   uint32_t now = millis();
   if (now - this->last_interval_ > this->interval_) {
     this->callback_(
-#ifdef ARDUINO_AVR_UNO
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
         this->argument_
 #endif
     );

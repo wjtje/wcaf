@@ -9,7 +9,7 @@ void Led::setup() {
   this->output_->write(false);
   if (this->interval_ == nullptr) this->interval_ = new interval::Interval();
 
-#ifdef ARDUINO_AVR_UNO
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   this->interval_->set_argument(this);
   this->interval_->set_callback([](void *argument) {
     auto led = (led::Led *)argument;

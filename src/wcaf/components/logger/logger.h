@@ -42,7 +42,7 @@ class Logger : public wcaf::Component {
   void set_baud_rate(uint64_t baud_rate) { this->baud_rate_ = baud_rate; }
   void set_buffer_size(size_t size) { this->buff_size_ = size; }
 
-#if defined(ARDUINO_AVR_UNO)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   void print(uint8_t level, const char *tag, int line,
              uint_farptr_t format_addr, size_t format_size, va_list args) {
     auto format_buff = (char *)malloc(format_size);

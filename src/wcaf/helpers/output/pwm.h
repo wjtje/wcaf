@@ -1,5 +1,5 @@
 #pragma once
-#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_ARCH_ESP8266)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_ARCH_ESP8266)
 
 #include <Arduino.h>
 

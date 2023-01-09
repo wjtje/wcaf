@@ -106,6 +106,7 @@ class List {
 
     // Update tail if needed
     if (prev->next == nullptr) this->tail_ = prev;
+    if (this->tail_ == current) this->tail_ = next;
 
     // Free up memory
     delete current;

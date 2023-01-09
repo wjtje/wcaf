@@ -24,7 +24,7 @@ void Button::loop() {
         // The argument value is only needed for the AVR_UNO version
         if (this->on_release_.has_value())
           this->on_release_.value()(
-#ifdef ARDUINO_AVR_UNO
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
               argument_
 #endif
           );
@@ -32,7 +32,7 @@ void Button::loop() {
         WCAF_LOG_INFO("%i was pressed", this->input_->get_pin());
         if (this->on_press_.has_value())
           this->on_press_.value()(
-#ifdef ARDUINO_AVR_UNO
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
               argument_
 #endif
           );

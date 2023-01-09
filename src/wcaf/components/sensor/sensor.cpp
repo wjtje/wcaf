@@ -7,7 +7,7 @@ const char *Sensor::TAG = "Sensor";
 
 void Sensor::setup() {
   if (this->interval_ == nullptr) this->interval_ = new interval::Interval();
-#if defined(ARDUINO_AVR_UNO)
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   this->interval_->set_argument(this);
   this->interval_->set_callback([](void *parent) {
     auto sensor = (sensor::Sensor *)parent;
