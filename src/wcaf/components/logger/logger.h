@@ -2,8 +2,10 @@
 
 #include <Arduino.h>
 #include <stdarg.h>
-#include <wcaf/core/component.h>
-#include <wcaf/core/log.h>
+
+#include "wcaf/core/component.h"
+#include "wcaf/core/log.h"
+#include "wcaf/helpers/list.h"
 
 #define WCAF_LOG_COLOR_RED "31"     // ERROR
 #define WCAF_LOG_COLOR_GREEN "32"   // INFO
@@ -43,6 +45,15 @@ class Logger : public wcaf::Component {
   void set_buffer_size(size_t size) { this->buff_size_ = size; }
 
 #if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
+  void add_message_handler(void *argument,
+                           void (*lambda)(void *, const char *)) {
+    auto handler = (message_handler_ *)malloc(sizeof(message_handler_));
+    handler->argument = argument;
+    handler->lambda = lambda;
+
+    this->message_handlers_.push_back(handler);
+  }
+
   void print(uint8_t level, const char *tag, int line,
              uint_farptr_t format_addr, size_t format_size, va_list args) {
     auto format_buff = (char *)malloc(format_size);
@@ -57,10 +68,20 @@ class Logger : public wcaf::Component {
     this->buff_[this->buff_size_ - 1] = 0x00;
 
     delete format_buff;
-    Serial.println(this->buff_);
-    Serial.flush();
+    if (this->baud_rate_ != 0) {
+      Serial.println(this->buff_);
+      Serial.flush();
+    }
+
+    for (auto handler : this->message_handlers_) {
+      handler->lambda(handler->argument, this->buff_);
+    }
   }
 #elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
+  void add_message_handler(std::function<void(const char *message)> &&lambda) {
+    this->message_handlers_.push_back(lambda);
+  }
+
   void print(uint8_t level, const char *tag, int line, const char *format,
              va_list args) {
     if (level > 3) level = 3;
@@ -72,8 +93,14 @@ class Logger : public wcaf::Component {
     int pos = (remaining > 7) ? this->buff_pos_ : this->buff_size_ - 8;
     memcpy(this->buff_ + pos, "\033[0m\n\0", 7);
 
-    Serial.write(this->buff_);
-    Serial.flush();
+    if (this->baud_rate_ != 0) {
+      Serial.write(this->buff_);
+      Serial.flush();
+    }
+
+    for (auto handler : this->message_handlers_) {
+      handler(this->buff_);
+    }
   }
 #endif
 
@@ -82,6 +109,17 @@ class Logger : public wcaf::Component {
   size_t buff_size_{128};
   char *buff_;
   int buff_pos_ = 0;
+
+#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
+  struct message_handler_ {
+    void *argument;
+    void (*lambda)(void *, const char *);
+  };
+
+  list::List<message_handler_ *> message_handlers_;
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
+  list::List<std::function<void(const char *message)> > message_handlers_;
+#endif
 
   inline void vsnprintf_to_buff_(const char *format, va_list args) {
     int remaining = this->buff_size_ - buff_pos_;

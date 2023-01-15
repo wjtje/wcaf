@@ -7,7 +7,7 @@ const char *Logger::TAG = "Logger";
 
 void Logger::pre_setup() {
   global_logger = this;
-  Serial.begin(this->baud_rate_);
+  if (this->baud_rate_ != 0) Serial.begin(this->baud_rate_);
   this->buff_ = (char *)malloc(this->buff_size_);
 }
 
