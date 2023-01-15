@@ -46,7 +46,7 @@ class Logger : public wcaf::Component {
 
 #if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   void add_message_handler(void *argument,
-                           void (*lambda)(void *, const char *)) {
+                           void (*lambda)(void *, const char *, const char *)) {
     auto handler = (message_handler_ *)malloc(sizeof(message_handler_));
     handler->argument = argument;
     handler->lambda = lambda;
@@ -74,11 +74,12 @@ class Logger : public wcaf::Component {
     }
 
     for (auto handler : this->message_handlers_) {
-      handler->lambda(handler->argument, this->buff_);
+      handler->lambda(handler->argument, tag, this->buff_);
     }
   }
 #elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
-  void add_message_handler(std::function<void(const char *message)> &&lambda) {
+  void add_message_handler(
+      std::function<void(const char *tag, const char *message)> &&lambda) {
     this->message_handlers_.push_back(lambda);
   }
 
@@ -99,7 +100,7 @@ class Logger : public wcaf::Component {
     }
 
     for (auto handler : this->message_handlers_) {
-      handler(this->buff_);
+      handler(tag, this->buff_);
     }
   }
 #endif
@@ -113,12 +114,13 @@ class Logger : public wcaf::Component {
 #if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   struct message_handler_ {
     void *argument;
-    void (*lambda)(void *, const char *);
+    void (*lambda)(void *, const char *, const char *);
   };
 
   list::List<message_handler_ *> message_handlers_;
 #elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
-  list::List<std::function<void(const char *message)> > message_handlers_;
+  list::List<std::function<void(const char *tag, const char *message)> >
+      message_handlers_;
 #endif
 
   inline void vsnprintf_to_buff_(const char *format, va_list args) {
