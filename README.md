@@ -406,6 +406,7 @@ application_.register_component(sensor_);
 ```cpp
 void set_input(interface::Input *input);
 void set_interval(uint32_t interval);
+float get_value();
 // For lambda function on Arduino see bottom of the page
 void on_value(std::function<void(float)> &&lambda);
 ```

@@ -25,6 +25,7 @@ class Sensor : public Component {
     if (this->interval_ == nullptr) this->interval_ = new interval::Interval();
     this->interval_->set_interval(interval);
   }
+  float get_value() { return this->last_value_; }
 
 #if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   void set_argument(void *argument) { this->argument_ = argument; }
@@ -38,6 +39,7 @@ class Sensor : public Component {
  protected:
   interface::Input *input_;
   interval::Interval *interval_{nullptr};
+  float last_value_{0.0f};
 
 #if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   void *argument_{nullptr};
