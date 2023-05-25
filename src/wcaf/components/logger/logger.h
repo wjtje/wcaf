@@ -61,8 +61,8 @@ class Logger : public wcaf::Component {
 
     if (level > 3) level = 3;
     this->buff_pos_ = 0;
-    this->printf_to_buff_("%s[%s][%s:%03u]: ", LOG_LEVEL_COLORS[level],
-                          LOG_LEVEL_LETTERS[level], tag, line);
+    this->printf_to_buff_("%s%s (%lu)[%s:%03u]: ", LOG_LEVEL_COLORS[level],
+                          LOG_LEVEL_LETTERS[level], millis(), tag, line);
     this->vsnprintf_to_buff_(format_buff, args);
     this->printf_to_buff_(WCAF_LOG_RESET_COLOR);
     this->buff_[this->buff_size_ - 1] = 0x00;

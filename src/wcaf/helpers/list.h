@@ -98,15 +98,9 @@ class List {
     Node *current = it.ptr_;
     Node *next = current->next;
 
-    // Move next point to the correct location
-    if (prev->next != current)
-      this->head_ = next;
-    else
-      prev->next = next;
-
-    // Update tail if needed
-    if (prev->next == nullptr) this->tail_ = prev;
-    if (this->tail_ == current) this->tail_ = next;
+    if (this->head_ == current) this->head_ = next;
+    if (this->tail_ == current) this->tail_ = prev;
+    if (prev != nullptr) prev->next = next;
 
     // Free up memory
     delete current;
@@ -115,7 +109,7 @@ class List {
   }
 
   Iterator erase(T data) {
-    for (List<T>::Iterator it = this->begin(); it != this->end();) {
+    for (List<T>::Iterator it = this->begin(); it != this->end(); it++) {
       if (data == *it) return this->erase(it);
     }
 

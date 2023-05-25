@@ -16,6 +16,7 @@ class Application : public Component {
   static const char *TAG;
 
   void register_component(Component *component);
+  void unregister_component(Component *component);
 
  protected:
   list::List<Component *> components_;

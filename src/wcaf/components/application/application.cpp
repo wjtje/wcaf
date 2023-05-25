@@ -30,5 +30,9 @@ void Application::register_component(Component *component) {
   this->components_.push_back(component);
 }
 
+void Application::unregister_component(Component *component) {
+  this->components_.erase(component);
+}
+
 }  // namespace application
 }  // namespace wcaf
