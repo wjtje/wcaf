@@ -1,7 +1,7 @@
 #include "log.h"
 
 namespace wcaf {
-
+#if !defined(WCAF_NO_LOG)
 #if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
 void wcaf_log(uint8_t level, const char *tag, int line,
               uint_farptr_t format_addr, size_t format_size, ...) {
@@ -24,6 +24,7 @@ void wcaf_log(uint8_t level, const char *tag, int line, const char *format,
   log->print(level, tag, line, format, args);
   va_end(args);
 }
+#endif
 #endif
 
 }  // namespace wcaf

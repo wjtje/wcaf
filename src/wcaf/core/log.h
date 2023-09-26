@@ -3,7 +3,11 @@
 #include <wcaf/components/logger/logger.h>
 
 namespace wcaf {
-
+#ifdef WCAF_NO_LOG
+#define WCAF_LOG(level, format, ...) \
+  do {                               \
+  } while (0)
+#else
 #if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
 void wcaf_log(uint8_t level, const char *tag, int line,
               uint_farptr_t format_addr, size_t format_size, ...);
@@ -20,6 +24,7 @@ void wcaf_log(uint8_t level, const char *tag, int line, const char *format,
 
 #define WCAF_LOG(level, format, ...) \
   wcaf_log(level, TAG, __LINE__, format, ##__VA_ARGS__);
+#endif
 #endif
 
 #define WCAF_LOG_DEFAULT(format, ...) WCAF_LOG(0, format, ##__VA_ARGS__);

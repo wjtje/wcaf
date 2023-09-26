@@ -190,17 +190,17 @@ void loop() { application_.loop(); }
 This code will result in the follow logs
 
 ```log
-[I][Application:009]: Setting up 2 component(s)
-[][Application:012]: Setting up Logger
-[][Application:012]: Setting up Interval
-[I][Main:025]: Hello World!
-[I][Main:025]: Hello World!
-[I][Main:025]: Hello World!
+I (0)[Application:009]: Setting up 2 component(s)
+  (5)[Application:012]: Setting up Logger
+  (10)[Application:012]: Setting up Interval
+I (1000)[Main:027]: Hello World!
+I (2000)[Main:027]: Hello World!
+I (3000)[Main:027]: Hello World!
 ```
 
 ## Logging
 
-One of the most important things to do is generating usefull logs for debugging your code. WCAF includes a simple logging framework with 4 different logging levels (DEFAULT, INFO, WARNING, ERROR).
+One of the most important things to do is generating usefull logs for debugging your code. WCAF includes a simple logging framework with 4 different logging levels (DEFAULT, INFO, WARNING, ERROR). It also contains the TAG variable, line number and millis since startup.
 
 **Example:**
 
@@ -212,10 +212,10 @@ WCAF_LOG_ERROR("Welp, it's broken");
 ```
 
 ```log
-[ ][Main:001]: Not important
-[I][Main:002]: Hej, new data
-[W][Main:003]: Hold up, something is not right
-[E][Main:004]: Welp, it's broken
+  (0)[Main:001]: Not important
+I (1)[Main:002]: Hej, new data
+W (5)[Main:003]: Hold up, something is not right
+E (9)[Main:004]: Welp, it's broken
 ```
 
 ## Using built-in helpers
@@ -448,3 +448,7 @@ application_.register_component(button_);
 The MIT License (MIT) - Copyright (c) 2022 Wouter van der Wal
 
 This code comes with ABSOLUTELY NO WARRANTY.
+
+## Why was this project created?
+
+This project was created for a school project were we weren't allowed to use any libraries, and I wanted a 'Framework' to easly split code and do some basic logging. Well this does that and not much more.
