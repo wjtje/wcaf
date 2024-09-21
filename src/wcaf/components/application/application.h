@@ -3,7 +3,7 @@
 
 #include "wcaf/core/component.h"
 #include "wcaf/core/log.h"
-#include "wcaf/helpers/list.h"
+#include "wcaf/helpers/vector.h"
 
 namespace wcaf {
 namespace application {
@@ -19,7 +19,8 @@ class Application : public Component {
   void unregister_component(Component *component);
 
  protected:
-  list::List<Component *> components_;
+  typedef Vector<Component *> t_Components;
+  t_Components components_;
 };
 
 }  // namespace application

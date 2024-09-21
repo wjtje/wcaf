@@ -15,7 +15,9 @@ void Application::setup() {
 }
 
 void Application::loop() {
-  for (Component *component : this->components_) {
+  for (t_Components::size_type i = 0; i < this->components_.size(); i++) {
+    Component *component = this->components_.at(i);
+
     uint32_t start_component = millis();
     component->loop();
 
