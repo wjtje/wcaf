@@ -5,7 +5,7 @@
 
 #include "wcaf/core/component.h"
 #include "wcaf/core/log.h"
-#include "wcaf/helpers/list.h"
+#include "wcaf/helpers/vector.h"
 
 #define WCAF_LOG_COLOR_RED "31"     // ERROR
 #define WCAF_LOG_COLOR_GREEN "32"   // INFO
@@ -47,10 +47,7 @@ class Logger : public wcaf::Component {
 #if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
   void add_message_handler(void *argument,
                            void (*lambda)(void *, const char *, const char *)) {
-    auto handler = (message_handler_ *)malloc(sizeof(message_handler_));
-    handler->argument = argument;
-    handler->lambda = lambda;
-
+    message_handler_ handler = {.argument = argument, .lambda = lambda};
     this->message_handlers_.push_back(handler);
   }
 
@@ -73,8 +70,8 @@ class Logger : public wcaf::Component {
       Serial.flush();
     }
 
-    for (auto handler : this->message_handlers_) {
-      handler->lambda(handler->argument, tag, this->buff_);
+    for (auto &handler : this->message_handlers_) {
+      handler.lambda(handler.argument, tag, this->buff_);
     }
   }
 #elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
@@ -117,9 +114,9 @@ class Logger : public wcaf::Component {
     void (*lambda)(void *, const char *, const char *);
   };
 
-  list::List<message_handler_ *> message_handlers_;
+  Vector<message_handler_> message_handlers_;
 #elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
-  list::List<std::function<void(const char *tag, const char *message)> >
+  Vector<std::function<void(const char *tag, const char *message)> >
       message_handlers_;
 #endif
 
