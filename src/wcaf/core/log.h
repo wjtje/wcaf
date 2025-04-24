@@ -9,14 +9,13 @@ namespace wcaf {
   } while (0)
 #else
 #if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
-void wcaf_log(uint8_t level, const char *tag, int line,
-              uint_farptr_t format_addr, size_t format_size, ...);
+void wcaf_log(uint8_t level, const char *tag, int line, const char *format,
+              ...);
 
-#define WCAF_LOG(level, format, ...)                                      \
-  (__extension__({                                                        \
-    static const char __c[] PROGMEM = (format);                           \
-    wcaf_log(level, TAG, __LINE__, pgm_get_far_address(__c), sizeof(__c), \
-             ##__VA_ARGS__);                                              \
+#define WCAF_LOG(level, format, ...)                    \
+  (__extension__({                                      \
+    static const char __c[] PROGMEM = (format);         \
+    wcaf_log(level, TAG, __LINE__, __c, ##__VA_ARGS__); \
   }));
 #elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ESP32_DEV)
 void wcaf_log(uint8_t level, const char *tag, int line, const char *format,

@@ -13,9 +13,9 @@ namespace interval {
 
 class Interval : public Component {
  public:
-  void setup();
-  void loop();
-  const char *get_tag() { return TAG; }
+  virtual void setup() override;
+  virtual void loop() override;
+  virtual const char *get_tag() override { return TAG; }
   static const char *TAG;
 
   void set_interval(uint32_t interval) { this->interval_ = interval; }

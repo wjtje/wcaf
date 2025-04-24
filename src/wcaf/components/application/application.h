@@ -10,9 +10,9 @@ namespace application {
 
 class Application : public Component {
  public:
-  void setup();
-  void loop();
-  const char *get_tag() { return TAG; }
+  virtual void setup() override;
+  virtual void loop() override;
+  virtual const char *get_tag() override { return TAG; }
   static const char *TAG;
 
   void register_component(Component *component);

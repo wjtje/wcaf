@@ -102,7 +102,7 @@ class CircularBuffer {
    * @return const T& A reference to that value
    */
   const T& dpop() {
-    T& d = this->buffer_[this->head_];
+    const T& d = this->buffer_[this->head_];
     this->retreat_pointer_();
     return d;
   }

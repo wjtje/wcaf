@@ -53,8 +53,8 @@ class Vector {
   void reserve(size_type new_cap) {
     if (new_cap <= capacity_) return;
 
-    T *new_data = (T *)realloc(data_, new_cap * sizeof(T));
-    if (new_data == NULL) return;  // Realloc failed
+    T *new_data = static_cast<T *>(realloc(data_, new_cap * sizeof(T)));
+    if (new_data == nullptr) return;  // Realloc failed
 
     data_ = new_data;
     capacity_ = new_cap;
